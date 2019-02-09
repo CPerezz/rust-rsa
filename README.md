@@ -5,7 +5,7 @@
 
 TODO:
 - [x] Generate big numbers of 1024 bits and 2048 bits.
-- [ ] Implement modular exponentiation operation for Rabin-Miller algorithm.
+- [x] Implement modular exponentiation operation needed by Rabin-Miller algorithm. (**TESTED AND WORKING**)
 - [ ] Implement Rabin Miller algorithm.
 - [ ] Generate valid KeyPairs of a deterministic lenght.
 - [ ] Encrypt messages with Public Key.
