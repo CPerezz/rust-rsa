@@ -39,8 +39,8 @@ fn rabin_miller(proposal: &BigUint) -> bool {
     true
 }
 
-// Modular exponentiation squaring
-fn mod_pow(base: &BigUint, exp: &BigUint, md: &BigUint) -> BigUint {
+// Modular exponentiation implemented on binary exponentiation (squaring)
+fn mod_exp_pow(base: &BigUint, exp: &BigUint, md: &BigUint) -> BigUint {
     let mut res = BigUint::one();
     let (zero, one) = (BigUint::zero(), BigUint::one());
     let (mut base, mut exponent) = (base.clone(), exp.clone());
@@ -49,7 +49,9 @@ fn mod_pow(base: &BigUint, exp: &BigUint, md: &BigUint) -> BigUint {
         if exponent.clone() & one.clone() > zero {
             res = (res * base.clone()) % md;
         }
+        // Shifting 1 bit of the exponent as a binary number.
         exponent >>= 1;
+        // Generating next base by squaring
         base = (base.clone() * base.clone()) % md;
     }
     res
@@ -64,9 +66,9 @@ fn generates_random_biguint() {
 
 #[test]
 fn mod_exp_works() {
-    let res = mod_pow(&BigUint::from(4 as u32), &BigUint::from(13 as u32), &BigUint::from(497 as u32));
+    let res = mod_exp_pow(&BigUint::from(4 as u32), &BigUint::from(13 as u32), &BigUint::from(497 as u32));
     assert_eq!(res, BigUint::from(445 as u32));
 
-    let res2 = mod_pow(&BigUint::from(5 as u32), &BigUint::from(3 as u32), &BigUint::from(13 as u32));
+    let res2 = mod_exp_pow(&BigUint::from(5 as u32), &BigUint::from(3 as u32), &BigUint::from(13 as u32));
     assert_eq!(res2, BigUint::from(8 as u32));
 }
