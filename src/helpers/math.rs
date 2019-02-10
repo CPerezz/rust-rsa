@@ -51,7 +51,6 @@ fn rabin_miller(proposal: &BigUint, t: i32) -> bool {
 
     let mut counter = 0;
     while counter < t {
-        println!("New outer iteration");
         // Gen rand biguint from a range (2, proposal-2)
         let mut rng = rand::thread_rng();
         let a = rng.gen_biguint_range(two , &(proposal - two) );
@@ -60,7 +59,6 @@ fn rabin_miller(proposal: &BigUint, t: i32) -> bool {
         if x != one.to_owned() && x != proposal.to_owned() - one {
             let mut i = zero.clone();
             loop {
-                println!("Stucked on infinite loop?");
                 x = mod_exp_pow(&x, &two, proposal);
                 if x == proposal.to_owned() - one {break;}
                 if x == one.to_owned() || i >= s.clone()- one{return false;};
@@ -70,7 +68,6 @@ fn rabin_miller(proposal: &BigUint, t: i32) -> bool {
         }
         counter +=2;
     }  
-    println!("At least once I arrive here");
     true
 }
 
