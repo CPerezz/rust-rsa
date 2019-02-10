@@ -57,13 +57,14 @@ fn rabin_miller(proposal: &BigUint, t: i32) -> bool {
         let a = rng.gen_biguint_range(two , &(proposal - two) );
 
         let mut x = mod_exp_pow(&a, &d, proposal);
-        if x == one.to_owned() || x == proposal.to_owned() - one {
+        if x != one.to_owned() && x != proposal.to_owned() - one {
             let mut i = zero.clone();
             loop {
                 println!("Stucked on infinite loop?");
-                let y = mod_exp_pow(&x, &two, proposal);
-                if y == one.to_owned() || i == s.clone()-one {return false};
-                if y == proposal.to_owned() - one {break}
+                x = mod_exp_pow(&x, &two, proposal);
+                if x == proposal.to_owned() - one {break;}
+                if x == one.to_owned() || i >= s.clone()- one{return false;};
+                
                 i = i.clone() + one;
             }
         }
@@ -121,26 +122,26 @@ fn mod_exp_works() {
     assert_eq!(res2, BigUint::from(8 as u32));
 }
 
-#[ignore]
+
 #[test]
 fn rabin_miller_works() {
     //Small primes
-    let res = rabin_miller(&115486869u32.to_biguint().unwrap(), 9);
+    let res = rabin_miller(&179425357u32.to_biguint().unwrap(), 9);
     assert_eq!(res, true);
-    let res2 = rabin_miller(&179425357u32.to_biguint().unwrap(), 9);
+    let res2 = rabin_miller(&97u32.to_biguint().unwrap(), 64);
     assert_eq!(res2, true);
     
-    /*
+    
     // Big primes
     let known_prime_str =
     "118595363679537468261258276757550704318651155601593299292198496313960907653004730006758459999825003212944725610469590674020124506249770566394260832237809252494505683255861199449482385196474342481641301503121142740933186279111209376061535491003888763334916103110474472949854230628809878558752830476310536476569";
     let known_prime: BigUint = FromStr::from_str(known_prime_str).unwrap();
-    assert!(rabin_miller(&known_prime, 9));*/
+    assert!(rabin_miller(&known_prime, 64));
 }
 
 
 #[test]
 fn gen_big_prime_works() {
-    let res = gen_big_prime(&512u32, 9);
+    let res = gen_big_prime(&512u32, 64);
     println!("The generated prime of 1024 bits is: {}", res);
 }
