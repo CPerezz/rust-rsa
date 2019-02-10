@@ -142,6 +142,6 @@ fn rabin_miller_works() {
 
 #[test]
 fn gen_big_prime_works() {
-    let res = gen_big_prime(&512u32, 64);
+    let res = gen_big_prime(&1024u32, 64);
     println!("The generated prime of 1024 bits is: {}", res);
 }
