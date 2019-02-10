@@ -14,7 +14,7 @@ pub fn gen_big_num(bit_len: &u32) -> BigUint {
 
 // Given lenght, generates a prime number of that lenght approximately.
 // That prime number is prime with probability = 4^-threshold 
-pub fn gen_big_prime(size: &u32, threshold: i32) -> BigUint {
+pub fn gen_big_prime(size: &u32, threshold: u32) -> BigUint {
     let mut proposal =  gen_big_num(size);
     // Remove all even numbers to reduce the iterations a half.
     if proposal.is_even() {
@@ -28,7 +28,7 @@ pub fn gen_big_prime(size: &u32, threshold: i32) -> BigUint {
 }
 
 // Given a prime proposal, compute Rabin Miller's algorithm.
-fn is_prime(proposal: &BigUint, threshold: i32) -> bool {
+fn is_prime(proposal: &BigUint, threshold: u32) -> bool {
     if !rabin_miller(proposal, threshold) {return false}
     true
 }
@@ -38,7 +38,7 @@ fn is_prime(proposal: &BigUint, threshold: i32) -> bool {
 // The function recieves a prime proposal and the threshold probability of a false positive
 // due to composite numbers reported as primes.
 // The pobability of a false positive is 4^-threshold. With t=9 => P(false_positive) = 3/1_000_000 
-fn rabin_miller(proposal: &BigUint, t: i32) -> bool {
+fn rabin_miller(proposal: &BigUint, t: u32) -> bool {
     // Needed constants
     let (zero, one, two) = (&BigUint::zero(), &BigUint::from(1 as u32), &BigUint::from(2 as u32));
     
