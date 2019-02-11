@@ -1,7 +1,7 @@
 //! Math functions to build keys with trusted primes
 use std::str::FromStr;
 use rand::Rng;
-use num_bigint::{ToBigUint, BigUint, RandBigInt};
+use num_bigint::{ToBigUint, BigUint, RandBigInt, BigInt};
 use num::{Zero, One, Integer};
 
 // Generates a big number of lenght = u32 param.
@@ -103,6 +103,23 @@ fn refactor(n: &BigUint) -> (BigUint, BigUint) {
   (s, d)
 }
 
+// Extended Euclidean Algorithm
+// Returns gcd(a,b) and Bézout's identity coefficients
+// ax + by = gcd(a,b)
+pub fn egcd<'a>(a: &'a mut BigInt, b: &'a mut BigInt) -> (BigInt, BigInt, BigInt) {
+    // base case
+    if *a == BigInt::from(0 as u32) {
+        (b.clone(), BigInt::from(0 as i32), BigInt::from(1 as i32))
+    } else {
+        let mut b_mod_a = b.clone() % a.clone();
+        let ref_b_mod_a = &mut b_mod_a;
+        let (g, x, y) = egcd(ref_b_mod_a, a);
+        let mut b_div_a = b.clone() / a.clone();
+        let ref_b_div_a = &mut b_div_a;
+        (g, (y - ref_b_div_a.clone() * x.clone()), x)
+    }
+}
+
 
 #[test]
 fn generates_random_biguint() {
@@ -141,4 +158,26 @@ fn rabin_miller_works() {
 fn gen_big_prime_works() {
     let res = gen_big_prime(&1024u32, 64);
     println!("The generated prime of 1024 bits is: {}", res);
+}
+
+#[test]
+fn egcd_test() {
+    use num_bigint::ToBigInt;
+    use std::str::FromStr;
+
+    // small primes
+    let a = &mut 179425357u32.to_bigint().unwrap();
+    let b = &mut 97u32.to_bigint().unwrap();
+    let (g, x, y) = egcd(a, b);
+    assert_eq!(a.clone()*x + b.clone()*y, g);
+
+    // big primes
+    let known_prime_str = "118595363679537468261258276757550704318651155601593299292198496313960907653004730006758459999825003212944725610469590674020124506249770566394260832237809252494505683255861199449482385196474342481641301503121142740933186279111209376061535491003888763334916103110474472949854230628809878558752830476310536476569";
+    let known_prime_str_2 = "357111317192329313741434753596167717379838997101103107109113127131137139149151157163167173179181191193197199211223227229233239241251257263269271277281283293307311313317331337347349353359367373379383389397401409419421431433439443449457461463467479487491499503509521523541547557563569571577587593599601607613617619631641643647653659661673677683691701709719727733739743751757761769773787797809811821823827829839853857859863877881883887907911919929937941947953967971977983991997";
+    let mut a: BigInt = FromStr::from_str(known_prime_str).unwrap();
+    let mut b: BigInt = FromStr::from_str(known_prime_str_2).unwrap();
+    let a_r = &mut a;
+    let b_r = &mut b;
+    let (g, x, y) = egcd(a_r, b_r);
+    assert_eq!(a_r.clone()*x + b_r.clone()*y, g);
 }
