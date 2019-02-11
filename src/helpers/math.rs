@@ -27,6 +27,7 @@ pub fn gen_big_prime(size: &u32, threshold: u32) -> BigUint {
     proposal
 }
 
+// Posible to remove and implement it on gen big prime
 // Given a prime proposal, compute Rabin Miller's algorithm.
 fn is_prime(proposal: &BigUint, threshold: u32) -> bool {
     if !rabin_miller(proposal, threshold) {return false}
@@ -125,7 +126,7 @@ fn rabin_miller_works() {
     //Small primes
     let res = rabin_miller(&179425357u32.to_biguint().unwrap(), 9);
     assert_eq!(res, true);
-    let res2 = rabin_miller(&97u32.to_biguint().unwrap(), 64);
+    let res2 = rabin_miller(&82589933u32.to_biguint().unwrap(), 64);
     assert_eq!(res2, true);
     
     
@@ -139,6 +140,6 @@ fn rabin_miller_works() {
 
 #[test]
 fn gen_big_prime_works() {
-    let res = gen_big_prime(&1024u32, 64);
+    let res = gen_big_prime(&1024u32, 9);
     println!("The generated prime of 1024 bits is: {}", res);
 }
