@@ -2,8 +2,9 @@ use num_bigint::{BigUint, BigInt, ToBigInt, Sign};
 use crate::helpers::math::*;
 use crate::helpers::generics::*;
 use num::One;
+use std::fmt;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq)]
 pub struct KeyPair {
     pub pk: PublicKey,
     pub sk: SecretKey,
@@ -11,19 +12,19 @@ pub struct KeyPair {
     pub threshold: u32
 }
 
-#[derive(Clone, Debug)]
-pub struct SecretKey {
-    n: BigUint,
-    d: BigUint
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq)]
 pub struct PublicKey {
     n: BigUint,
     e: BigUint
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq)]
+pub struct SecretKey {
+    n: BigUint,
+    d: BigUint
+}
+
+#[derive(Clone, Copy, PartialEq)]
 pub struct Threshold {
     value: u32
 }
@@ -51,6 +52,13 @@ impl Threshold {
     }
 }
 
+
+// Implementation of Display for KeyPair Struct.
+impl fmt::Display for KeyPair {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "\nPublic Key: \n{}\nSecret Key: \n{}\nSize: {}\nThreshold: {} which gives a P(err_primes_gen) = 4^(-{})", self.pk, self.sk, self.size, self.threshold, self.threshold)
+    }
+}
 
 impl KeyPair {
     // Generate a new KeyPair Struct from scratch by giving the size of the key desired (in bits) and the threshold of P(err) while assuming that
@@ -93,6 +101,13 @@ impl KeyPair {
 
 
 
+// Implementation of Display for KeyPair Struct.
+impl fmt::Display for PublicKey {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "n: {}\ne: {}", self.n, self.e)
+    }
+}
+
 impl PublicKey {
     // Generate a PublicKey struct from n and d co-prime factors.
     fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
@@ -119,6 +134,14 @@ impl PublicKey {
                 }            
             }
         }
+    }
+}
+
+
+// Implementation of Display for KeyPair Struct.
+impl fmt::Display for SecretKey {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "n: {}\ne: {}", self.n, self.d)
     }
 }
 
@@ -156,7 +179,7 @@ impl SecretKey {
 #[test]
 fn generates_key_pair() {
     let a = KeyPair::new(&512u32, &Threshold::default());
-    println!("This is your KeyPair!!! {:?}", a);
-    let big_keypair = KeyPair::new(&1024u32, &Threshold::new(&9u32));
-    println!("This is your KeyPair!!! {:?}", big_keypair);
+    println!("This is your KeyPair!!! {}", a.unwrap());
+    //let big_keypair = KeyPair::new(&1024u32, &Threshold::new(&9u32));
+    //println!("This is your KeyPair!!! {:?}", big_keypair);
 }
