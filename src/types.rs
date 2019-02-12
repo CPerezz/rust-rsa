@@ -76,7 +76,7 @@ impl KeyPair {
         let (_, emuld, _) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
         let d = emuld / e.to_bigint().unwrap();
         println!("Found d {}", d);
-        let sk = SecretKey::new(&n, &bigUnt_from_bigIint(&d)).unwrap();
+        let sk = SecretKey::new(&n, &biguint_from_bigint(&d)).unwrap();
 
         println!("Arrive at building!!");
         //Building KeyPair struct

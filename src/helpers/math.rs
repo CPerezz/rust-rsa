@@ -144,7 +144,7 @@ pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
     }
 
     if res == one {
-        return Ok(bigUnt_from_bigIint(&a));
+        return Ok(biguint_from_bigint(&a));
     }
     Err(false)
 }
