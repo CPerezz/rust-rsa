@@ -32,7 +32,7 @@ impl Threshold {
     // Creates a Threshold with a default error probability of generating a prime of 4^-64
     pub fn default() -> Self {
         let threshold = Threshold {
-            value: 64 as u32
+            value: 9 as u32
         };
         threshold
     }
