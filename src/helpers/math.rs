@@ -130,10 +130,15 @@ pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
     let sign = Sign::Plus;
     let mut fi_n = BigInt::from_biguint(sign, fi_n.clone());
     let (zero, one, two) = gen_basic_bigints();
-    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &((fi_n.clone() * (two.clone() + one.clone()))/two.clone()));
+    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &(fi_n.clone()));
+    //We want to avoid the even random numbers.
+    if a.is_even() {a = a + one.clone()};
     let mut res = zero;
+    println!("Starting While");
     while res != one.clone() && a <= fi_n.clone() - one.clone() {
+        println!("New iteration a = {}", a);
         let (res2, _, _) = egcd(&mut fi_n, &mut a);
+        println!("Res of inside egcd: {}", res2);
         res = res2;
         a = a.clone() + two.clone(); 
     }
