@@ -3,6 +3,7 @@ use crate::helpers::math::*;
 use crate::helpers::generics::*;
 use num::One;
 
+#[derive(Clone, Debug)]
 pub struct KeyPair {
     pub pk: PublicKey,
     pub sk: SecretKey,
@@ -10,16 +11,19 @@ pub struct KeyPair {
     pub threshold: u32
 }
 
+#[derive(Clone, Debug)]
 pub struct SecretKey {
     n: BigUint,
     d: BigUint
 }
 
+#[derive(Clone, Debug)]
 pub struct PublicKey {
     n: BigUint,
     e: BigUint
 }
 
+#[derive(Clone, Debug)]
 pub struct Threshold {
     value: u32
 }
@@ -43,20 +47,25 @@ impl KeyPair {
         let (_, one, _) = gen_basic_biguints();
         // Gen p q primal base
         let p = gen_big_prime(size, threshold.value);
+        println!("1st prime found! {}", p);
         let q = gen_big_prime(size, threshold.value);
+        println!("2nd prime found! {}", q);
         // Gen n and fi_n
         let n = &p * &q;
         let fi_n = (&p - &one) * (&q - &one);
         // Find a positive integer minor than fi_n , co-prime with fi_n 
         let e = found_e(&fi_n).unwrap();
+        println!("Found e!! {}", e);
 
         // Building Pk Struct
         let pk = PublicKey::new(&n, &e).unwrap();
         // Finding d and building Secret Key Struct
         let (_, emuld, _) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
         let d = emuld / e.to_bigint().unwrap();
+        println!("Found d {}", d);
         let sk = SecretKey::new(&n, &bigUnt_from_bigIint(&d)).unwrap();
 
+        println!("Arrive at building!!");
         //Building KeyPair struct
         let kp = KeyPair {
             pk: pk,
@@ -128,4 +137,13 @@ impl SecretKey {
             }
         }
     }
+}
+
+
+#[test]
+fn generates_key_pair() {
+    let a = KeyPair::new(&512u32, &Threshold::default());
+    println!("This is your KeyPair!!! {:?}", a);
+    let big_keypair = KeyPair::new(&1024u32, &Threshold::default());
+    println!("This is your KeyPair!!! {:?}", big_keypair);
 }
