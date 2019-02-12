@@ -36,6 +36,19 @@ impl Threshold {
         };
         threshold
     }
+
+    // Creates a Threshold with a selected value as thresholf of P(err). P(err prime) = 4^-threshold. 
+    pub fn new(th: &u32) -> Self {
+        let th = Threshold {
+            value: *th
+        };
+        th
+    }
+
+    // Gets the value of a Threshold and returns it as u32.
+    pub fn value(th: Self) -> u32 {
+        th.value
+    }
 }
 
 
@@ -144,6 +157,6 @@ impl SecretKey {
 fn generates_key_pair() {
     let a = KeyPair::new(&512u32, &Threshold::default());
     println!("This is your KeyPair!!! {:?}", a);
-    let big_keypair = KeyPair::new(&1024u32, &Threshold::default());
+    let big_keypair = KeyPair::new(&1024u32, &Threshold::new(&9u32));
     println!("This is your KeyPair!!! {:?}", big_keypair);
 }
