@@ -81,8 +81,8 @@ impl KeyPair {
         // Building Pk Struct
         let pk = PublicKey::new(&n, &e).unwrap();
         // Finding d and building Secret Key Struct
-        let (_, emuld, _) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
-        let d = emuld / e.to_bigint().unwrap();
+        let (_, _, d) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
+        
         println!("Found d {}", d);
         let sk = SecretKey::new(&n, &biguint_from_bigint(&d)).unwrap();
 
@@ -141,7 +141,7 @@ impl PublicKey {
 // Implementation of Display for KeyPair Struct.
 impl fmt::Display for SecretKey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "n: {}\ne: {}", self.n, self.d)
+        write!(f, "n: {}\nd: {}", self.n, self.d)
     }
 }
 
