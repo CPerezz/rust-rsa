@@ -130,7 +130,7 @@ pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
     let sign = Sign::Plus;
     let mut fi_n = BigInt::from_biguint(sign, fi_n.clone());
     let (zero, one, two) = gen_basic_bigints();
-    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &(BigInt::from_f64(0.75 as f64).unwrap() * fi_n.clone()));
+    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &((BigInt::from(3) * fi_n.clone())/BigInt::from(4) ));
     //We want to avoid the even random numbers.
     if a.is_even() {a = a + one.clone()};
     let mut res = zero;
@@ -144,6 +144,7 @@ pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
     }
 
     if res == one {
+        a = a.clone() - two.clone();
         return Ok(biguint_from_bigint(&a));
     }
     Err(false)
