@@ -2,7 +2,7 @@
 use std::str::FromStr;
 use rand::Rng;
 use num_bigint::{ToBigUint, BigUint, RandBigInt, BigInt, Sign};
-use num::{Zero, One, Integer};
+use num::{Zero, One, Integer, FromPrimitive};
 use crate::helpers::generics::*;
 
 
@@ -130,7 +130,7 @@ pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
     let sign = Sign::Plus;
     let mut fi_n = BigInt::from_biguint(sign, fi_n.clone());
     let (zero, one, two) = gen_basic_bigints();
-    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &(fi_n.clone()));
+    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &(BigInt::from_f64(0.75 as f64).unwrap() * fi_n.clone()));
     //We want to avoid the even random numbers.
     if a.is_even() {a = a + one.clone()};
     let mut res = zero;
