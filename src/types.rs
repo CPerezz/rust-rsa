@@ -132,6 +132,8 @@ impl PublicKey {
             }
         }
     }
+    //Encrypts the data passed on the params.
+    //pub fn encrypt(&str) -> 
 }
 
 
@@ -177,8 +179,4 @@ impl SecretKey {
 fn generates_key_pair() {
     let a = KeyPair::new(&512u32, &Threshold::new(&12));
     println!("This is your KeyPair!!! {}", a.unwrap());
-    let a = KeyPair::new(&512u32, &Threshold::new(&12));
-    println!("This is your KeyPair!!! {}", a.unwrap());
-    let big_keypair = KeyPair::new(&1024u32, &Threshold::new(&9u32));
-    println!("This is your KeyPair!!! {}", big_keypair.unwrap());
 }
