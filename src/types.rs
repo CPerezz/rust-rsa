@@ -1,8 +1,9 @@
 use num_bigint::{BigUint, BigInt, ToBigInt, Sign};
 use crate::helpers::math::*;
 use crate::helpers::generics::*;
-use num::One;
+use num::{Signed, One};
 use std::fmt;
+use std::ops::Neg;
 
 #[derive(Clone, PartialEq)]
 pub struct KeyPair {
@@ -68,25 +69,21 @@ impl KeyPair {
         let (_, one, _) = gen_basic_biguints();
         // Gen p q primal base
         let p = gen_big_prime(size, threshold.value);
-        println!("1st prime found! {}", p);
         let q = gen_big_prime(size, threshold.value);
-        println!("2nd prime found! {}", q);
         // Gen n and fi_n
         let n = &p * &q;
         let fi_n = (&p - &one) * (&q - &one);
         // Find a positive integer minor than fi_n , co-prime with fi_n 
         let e = found_e(&fi_n).unwrap();
-        println!("Found e!! {}", e);
 
         // Building Pk Struct
         let pk = PublicKey::new(&n, &e).unwrap();
         // Finding d and building Secret Key Struct
-        let (_, _, d) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
-        
-        println!("Found d {}", d);
+        let (_, _,mut d) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
+        if d.is_negative() {
+            d = d.neg();
+        }
         let sk = SecretKey::new(&n, &biguint_from_bigint(&d)).unwrap();
-
-        println!("Arrive at building!!");
         //Building KeyPair struct
         let kp = KeyPair {
             pk: pk,
@@ -178,8 +175,10 @@ impl SecretKey {
 
 #[test]
 fn generates_key_pair() {
-    let a = KeyPair::new(&512u32, &Threshold::default());
+    let a = KeyPair::new(&512u32, &Threshold::new(&12));
     println!("This is your KeyPair!!! {}", a.unwrap());
-    //let big_keypair = KeyPair::new(&1024u32, &Threshold::new(&9u32));
-    //println!("This is your KeyPair!!! {:?}", big_keypair);
+    let a = KeyPair::new(&512u32, &Threshold::new(&12));
+    println!("This is your KeyPair!!! {}", a.unwrap());
+    let big_keypair = KeyPair::new(&1024u32, &Threshold::new(&9u32));
+    println!("This is your KeyPair!!! {}", big_keypair.unwrap());
 }

@@ -134,11 +134,8 @@ pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
     //We want to avoid the even random numbers.
     if a.is_even() {a = a + one.clone()};
     let mut res = zero;
-    println!("Starting While");
     while res != one.clone() && a <= fi_n.clone() - one.clone() {
-        println!("New iteration a = {}", a);
         let (res2, _, _) = egcd(&mut fi_n, &mut a);
-        println!("Res of inside egcd: {}", res2);
         res = res2;
         a = a.clone() + two.clone(); 
     }
