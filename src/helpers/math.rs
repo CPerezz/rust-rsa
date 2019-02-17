@@ -75,7 +75,7 @@ fn rabin_miller(proposal: &BigUint, t: u32) -> bool {
 }
 
 // Modular exponentiation implemented on binary exponentiation (squaring)
-fn mod_exp_pow(base: &BigUint, exp: &BigUint, md: &BigUint) -> BigUint {
+pub fn mod_exp_pow(base: &BigUint, exp: &BigUint, md: &BigUint) -> BigUint {
     let mut res = BigUint::one();
     let (zero, one, _) = gen_basic_biguints();
     let (mut base, mut exponent) = (base.clone(), exp.clone());
