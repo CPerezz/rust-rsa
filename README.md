@@ -8,8 +8,8 @@ TODO:
 - [x] Implement modular exponentiation operation needed by Rabin-Miller algorithm. (**TESTED AND WORKING**)
 - [x] Implement Rabin Miller algorithm. (**TESTED AND WORKING**)
 - [x] Implement Extended Euclides Algorithm to search for mcd of two suposed prime numbers.
-- [x] Generate valid KeyPairs of a deterministic lenght. (**TESTED AND WORKING. RECOMMENDED THRESHOLD:DEFAULT // RECOMENDED SIZE: 512 OR 1024 BITS)
-- [ ] Encrypt messages with Public Key.
+- [x] Generate valid KeyPairs of a deterministic lenght. (**TESTED AND WORKING. RECOMMENDED THRESHOLD:DEFAULT // RECOMENDED SIZE: 512 OR 1024 BITS**)
+- [x] Encrypt messages with Public Key.
 - [ ] Decrypt messages with Secret Key.
 - [ ] Sign messages.
 - [ ] Order and write better tests.
