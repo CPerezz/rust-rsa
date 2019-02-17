@@ -15,3 +15,7 @@ pub fn biguint_from_bigint(a: &BigInt) -> BigUint {
     let biguint_str = Box::leak(boxed);
     BigUint::from_str(biguint_str).unwrap()
 }
+
+pub fn string_to_static_str(s: String) -> &'static str {
+    Box::leak(s.into_boxed_str())
+}
