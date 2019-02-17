@@ -114,7 +114,7 @@ impl PublicKey {
         })
     }
     // Generate a PublicKey struct from n, fi_n and d params with the co-prime property checking.
-    pub fn new_from_fi_n_e(_n: &BigUint, _fi_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
+    fn new_from_fi_n_e(_n: &BigUint, _fi_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
         let (_, _one, _) = gen_basic_bigints();
 
         match egcd(&mut BigInt::from_biguint(Sign::Plus, _fi_n.to_owned()), &mut BigInt::from_biguint(Sign::Plus, _e.to_owned())) {
@@ -132,8 +132,15 @@ impl PublicKey {
             }
         }
     }
-    //Encrypts the data passed on the params.
-    //pub fn encrypt(&str) -> 
+    // Encrypts the data passed on the params.
+    fn encrypt(&self, msg: &str) -> Result<&str, &'static str> {
+        if !msg.is_ascii(){
+            return Err("Message isn't ASCII like. Please remove non-ASCII characters.")
+        }else{
+            let res = BigUint::from_bytes_be(msg.as_bytes());
+            Ok(string_to_static_str(format!("{}", mod_exp_pow(&res, &self.e, &self.n))))
+        }
+    }
 }
 
 
@@ -177,6 +184,13 @@ impl SecretKey {
 
 #[test]
 fn generates_key_pair() {
-    let a = KeyPair::new(&512u32, &Threshold::new(&12));
+    let a = KeyPair::new(&512u32, &Threshold::new(&64));
     println!("This is your KeyPair!!! {}", a.unwrap());
+}
+
+#[test]
+fn encrypts_info(){
+    let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
+    let msg = "Hello World!";
+    println!("{}", kp.pk.encrypt(msg).unwrap());
 }
