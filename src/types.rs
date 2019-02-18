@@ -4,6 +4,7 @@ use crate::helpers::generics::*;
 use num::{Signed, One};
 use std::fmt;
 use std::ops::Neg;
+use std::str::{FromStr, from_utf8};
 
 #[derive(Clone, PartialEq)]
 pub struct KeyPair {
@@ -137,6 +138,7 @@ impl PublicKey {
         if !msg.is_ascii(){
             return Err("Message isn't ASCII like. Please remove non-ASCII characters.")
         }else{
+            println!("Message as bytes: {:?}", msg.as_bytes());
             let res = BigUint::from_bytes_be(msg.as_bytes());
             Ok(string_to_static_str(format!("{}", mod_exp_pow(&res, &self.e, &self.n))))
         }
@@ -179,6 +181,15 @@ impl SecretKey {
             }
         }
     }
+    
+    // Decrypts the cyphertext giving back an &str
+    fn decrypt(&self, text: &str) -> Result<&str, &'static str> {
+        let c = BigUint::from_str(text).unwrap();
+        let result_as_bytes = mod_exp_pow(&c, &self.d, &self.n).to_bytes_be();
+        println!("C as bytes: {:?}", result_as_bytes);
+        let res_decrypt = std::str::from_utf8(&result_as_bytes).unwrap();
+        Ok(string_to_static_str(format!("{}", res_decrypt)))
+    }
 }
 
 
@@ -193,4 +204,16 @@ fn encrypts_info(){
     let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
     let msg = "Hello World!";
     println!("{}", kp.pk.encrypt(msg).unwrap());
+}
+
+#[test]
+fn encrypts_decrypts_info(){
+    let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
+    let msg = "Hello RSA!";
+    let cyphertext = kp.pk.encrypt(msg).unwrap();
+    
+
+    let res_decrypt = kp.sk.decrypt(&cyphertext).unwrap();
+    println!("Result of decryption is: {}", res_decrypt);
+    assert_eq!(res_decrypt, "Hello RSA!")
 }
