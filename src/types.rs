@@ -140,6 +140,7 @@ impl PublicKey {
         }else{
             println!("Message as bytes: {:?}", msg.as_bytes());
             let res = BigUint::from_bytes_be(msg.as_bytes());
+            println!("COPRIMES IF ONE ---->>  {:?}", egcd(&mut BigInt::from_biguint(Sign::Plus, res.clone()), &mut BigInt::from_biguint(Sign::Plus, self.n.clone())).0);
             Ok(string_to_static_str(format!("{}", mod_exp_pow(&res, &self.e, &self.n))))
         }
     }
@@ -209,11 +210,11 @@ fn encrypts_info(){
 #[test]
 fn encrypts_decrypts_info(){
     let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
-    let msg = "Hello RSA!";
+    let msg = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent non nunc et ipsum tempus fermentum";
     let cyphertext = kp.pk.encrypt(msg).unwrap();
     
 
     let res_decrypt = kp.sk.decrypt(&cyphertext).unwrap();
     println!("Result of decryption is: {}", res_decrypt);
-    assert_eq!(res_decrypt, "Hello RSA!")
+    assert_eq!(res_decrypt, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent non nunc et ipsum tempus fermentum")
 }
