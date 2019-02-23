@@ -81,8 +81,8 @@ impl KeyPair {
         let pk = PublicKey::new(&n, &e).unwrap();
         // Finding d and building Secret Key Struct
         let (_, _,mut d) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
-        if d.is_negative() {
-            d = d.neg();
+        while d.is_negative() {
+            d = d + BigInt::from_biguint(Sign::Plus, fi_n.clone());
         }
         let sk = SecretKey::new(&n, &biguint_from_bigint(&d)).unwrap();
         //Building KeyPair struct
