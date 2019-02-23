@@ -73,6 +73,22 @@ fn rabin_miller(proposal: &BigUint, t: u32) -> bool {
     }  
     true
 }
+#[cfg(test)]
+#[test]
+fn rabin_miller_works() {
+    //Small primes
+    let res = rabin_miller(&179425357u32.to_biguint().unwrap(), 9);
+    assert_eq!(res, true);
+    let res2 = rabin_miller(&82589933u32.to_biguint().unwrap(), 64);
+    assert_eq!(res2, true);
+    
+    
+    // Big primes
+    let known_prime_str =
+    "118595363679537468261258276757550704318651155601593299292198496313960907653004730006758459999825003212944725610469590674020124506249770566394260832237809252494505683255861199449482385196474342481641301503121142740933186279111209376061535491003888763334916103110474472949854230628809878558752830476310536476569";
+    let known_prime: BigUint = FromStr::from_str(known_prime_str).unwrap();
+    assert!(rabin_miller(&known_prime, 64));
+}
 
 // Modular exponentiation implemented on binary exponentiation (squaring)
 pub fn mod_exp_pow(base: &BigUint, exp: &BigUint, md: &BigUint) -> BigUint {
@@ -90,6 +106,16 @@ pub fn mod_exp_pow(base: &BigUint, exp: &BigUint, md: &BigUint) -> BigUint {
         base = (base.clone() * base.clone()) % md;
     }
     res
+}
+
+#[cfg(test)]
+#[test]
+fn mod_exp_works() {
+    let res = mod_exp_pow(&BigUint::from(4 as u32), &BigUint::from(13 as u32), &BigUint::from(497 as u32));
+    assert_eq!(res, BigUint::from(445 as u32));
+
+    let res2 = mod_exp_pow(&BigUint::from(5 as u32), &BigUint::from(3 as u32), &BigUint::from(13 as u32));
+    assert_eq!(res2, BigUint::from(8 as u32));
 }
 
 // Given a number n, write n − 1 as 2s·d with d odd by factoring powers of 2 from n − 1
@@ -121,71 +147,7 @@ pub fn egcd<'a>(a: &'a mut BigInt, b: &'a mut BigInt) -> (BigInt, BigInt, BigInt
     }
 }
 
-// Given a fi_n, find on the interval (fi_n/2, fi_n) a number 
-// that is co-prime with fi_n
-pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
-    // Gen random number on interval
-    let mut rng = rand::thread_rng();
-    //Get fi_n as 
-    let sign = Sign::Plus;
-    let mut fi_n = BigInt::from_biguint(sign, fi_n.clone());
-    let (zero, one, two) = gen_basic_bigints();
-    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &((BigInt::from(3) * fi_n.clone())/BigInt::from(4) ));
-    //We want to avoid the even random numbers.
-    if a.is_even() {a = a + one.clone()};
-    let mut res = zero;
-    while res != one.clone() && a <= fi_n.clone() - one.clone() {
-        let (res2, _, _) = egcd(&mut fi_n, &mut a);
-        res = res2;
-        a = a.clone() + two.clone(); 
-    }
-
-    if res == one {
-        a = a.clone() - two.clone();
-        return Ok(biguint_from_bigint(&a).unwrap());
-    }
-    Err(false)
-}
-
-
-#[test]
-fn generates_random_biguint() {
-    let a = gen_big_num(&1024);
-    assert_ne!(a, BigUint::zero());
-}
-
-#[test]
-fn mod_exp_works() {
-    let res = mod_exp_pow(&BigUint::from(4 as u32), &BigUint::from(13 as u32), &BigUint::from(497 as u32));
-    assert_eq!(res, BigUint::from(445 as u32));
-
-    let res2 = mod_exp_pow(&BigUint::from(5 as u32), &BigUint::from(3 as u32), &BigUint::from(13 as u32));
-    assert_eq!(res2, BigUint::from(8 as u32));
-}
-
-
-#[test]
-fn rabin_miller_works() {
-    //Small primes
-    let res = rabin_miller(&179425357u32.to_biguint().unwrap(), 9);
-    assert_eq!(res, true);
-    let res2 = rabin_miller(&82589933u32.to_biguint().unwrap(), 64);
-    assert_eq!(res2, true);
-    
-    
-    // Big primes
-    let known_prime_str =
-    "118595363679537468261258276757550704318651155601593299292198496313960907653004730006758459999825003212944725610469590674020124506249770566394260832237809252494505683255861199449482385196474342481641301503121142740933186279111209376061535491003888763334916103110474472949854230628809878558752830476310536476569";
-    let known_prime: BigUint = FromStr::from_str(known_prime_str).unwrap();
-    assert!(rabin_miller(&known_prime, 64));
-}
-
-
-#[test]
-fn gen_big_prime_works() {
-    let res = gen_big_prime(&2056u32, 9);
-    println!("The generated prime of 1024 bits is: {}", res);
-}
+#[cfg(test)]
 
 #[test]
 fn egcd_test() {
@@ -213,4 +175,30 @@ fn egcd_test() {
     let b_r = &mut b;
     let (g, x, y) = egcd(a_r, b_r);
     assert_eq!(a_r.clone()*x + b_r.clone()*y, g);
+}
+
+// Given a fi_n, find on the interval (fi_n/2, fi_n) a number 
+// that is co-prime with fi_n
+pub fn find_e(fi_n: &BigUint) -> Result<BigUint, bool> {
+    // Gen random number on interval
+    let mut rng = rand::thread_rng();
+    //Get fi_n as 
+    let sign = Sign::Plus;
+    let mut fi_n = BigInt::from_biguint(sign, fi_n.clone());
+    let (zero, one, two) = gen_basic_bigints();
+    let mut a = rng.gen_bigint_range(&(fi_n.clone()/two.clone()) , &((BigInt::from(3) * fi_n.clone())/BigInt::from(4) ));
+    //We want to avoid the even random numbers.
+    if a.is_even() {a = a + one.clone()};
+    let mut res = zero;
+    while res != one.clone() && a <= fi_n.clone() - one.clone() {
+        let (res2, _, _) = egcd(&mut fi_n, &mut a);
+        res = res2;
+        a = a.clone() + two.clone(); 
+    }
+
+    if res == one {
+        a = a.clone() - two.clone();
+        return Ok(biguint_from_bigint(&a).unwrap());
+    }
+    Err(false)
 }
