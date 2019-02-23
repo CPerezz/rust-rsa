@@ -3,7 +3,7 @@ extern crate rsa_rust;
 use rsa_rust::helpers::math::*;
 use rsa_rust::types::*;
 
-
+#[cfg(test)]
 #[test]
 fn generates_random_biguint() {
     let a = gen_big_num(&1024);
@@ -18,6 +18,7 @@ fn generates_random_biguint() {
     assert_eq!(e.to_bytes_be().len(), 32 as usize);
 }
 
+#[cfg(test)]
 #[test]
 fn encrypts_info() {
     let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
@@ -25,6 +26,7 @@ fn encrypts_info() {
     println!("{}", kp.pk.encrypt(msg).unwrap());
 }
 
+#[cfg(test)]
 #[test]
 fn encrypts_decrypts_info() {
     let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
