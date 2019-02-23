@@ -2,7 +2,7 @@
 use std::str::FromStr;
 use rand::Rng;
 use num_bigint::{ToBigUint, BigUint, RandBigInt, BigInt, Sign};
-use num::{Zero, One, Integer, FromPrimitive};
+use num::{Zero, One, Integer};
 use crate::helpers::generics::*;
 
 
@@ -10,7 +10,7 @@ use crate::helpers::generics::*;
 pub fn gen_big_num(bit_len: &u32) -> BigUint {
     // RNG depends on rng_core crate.
     let mut rng = rand::thread_rng();
-    let mut a = rng.gen_biguint(bit_len.to_owned() as usize);
+    let a = rng.gen_biguint(bit_len.to_owned() as usize);
     a
 }
 
@@ -201,7 +201,7 @@ fn egcd_test() {
     // small primes
     let a = &mut 1024u32.to_bigint().unwrap();
     let b = &mut 512u32.to_bigint().unwrap();
-    let (g, x, y) = egcd(a, b);
+    let (g, _x, _y) = egcd(a, b);
     assert_eq!(512u32.to_bigint().unwrap(), g);
 
     // big primes

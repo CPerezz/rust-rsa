@@ -3,8 +3,7 @@ use crate::helpers::math::*;
 use crate::helpers::generics::*;
 use num::{Signed, One};
 use std::fmt;
-use std::ops::Neg;
-use std::str::{FromStr, from_utf8};
+use std::str::FromStr;
 
 #[derive(Clone, PartialEq)]
 pub struct KeyPair {
