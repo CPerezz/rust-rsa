@@ -84,7 +84,7 @@ impl KeyPair {
         while d.is_negative() {
             d = d + BigInt::from_biguint(Sign::Plus, fi_n.clone());
         }
-        let sk = SecretKey::new(&n, &biguint_from_bigint(&d)).unwrap();
+        let sk = SecretKey::new(&n, &biguint_from_bigint(&d).unwrap()).unwrap();
         //Building KeyPair struct
         let kp = KeyPair {
             pk: pk,
@@ -138,9 +138,7 @@ impl PublicKey {
         if !msg.is_ascii(){
             return Err("Message isn't ASCII like. Please remove non-ASCII characters.")
         }else{
-            println!("Message as bytes: {:?}", msg.as_bytes());
             let res = BigUint::from_bytes_be(msg.as_bytes());
-            println!("COPRIMES IF ONE ---->>  {:?}", egcd(&mut BigInt::from_biguint(Sign::Plus, res.clone()), &mut BigInt::from_biguint(Sign::Plus, self.n.clone())).0);
             Ok(format!("{}", mod_exp_pow(&res, &self.e, &self.n)))
         }
     }
