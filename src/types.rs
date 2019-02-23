@@ -134,14 +134,14 @@ impl PublicKey {
         }
     }
     // Encrypts the data passed on the params.
-    fn encrypt(&self, msg: &str) -> Result<&str, &'static str> {
+    fn encrypt(&self, msg: &str) -> Result<String, &'static str> {
         if !msg.is_ascii(){
             return Err("Message isn't ASCII like. Please remove non-ASCII characters.")
         }else{
             println!("Message as bytes: {:?}", msg.as_bytes());
             let res = BigUint::from_bytes_be(msg.as_bytes());
             println!("COPRIMES IF ONE ---->>  {:?}", egcd(&mut BigInt::from_biguint(Sign::Plus, res.clone()), &mut BigInt::from_biguint(Sign::Plus, self.n.clone())).0);
-            Ok(string_to_static_str(format!("{}", mod_exp_pow(&res, &self.e, &self.n))))
+            Ok(format!("{}", mod_exp_pow(&res, &self.e, &self.n)))
         }
     }
 }
@@ -184,12 +184,11 @@ impl SecretKey {
     }
     
     // Decrypts the cyphertext giving back an &str
-    fn decrypt(&self, text: &str) -> Result<&str, &'static str> {
+    fn decrypt(&self, text: &str) -> Result<String, &'static str> {
         let c = BigUint::from_str(text).unwrap();
         let result_as_bytes = mod_exp_pow(&c, &self.d, &self.n).to_bytes_be();
-        println!("C as bytes: {:?}", result_as_bytes);
         let res_decrypt = std::str::from_utf8(&result_as_bytes).unwrap();
-        Ok(string_to_static_str(format!("{}", res_decrypt)))
+        Ok(format!("{}", res_decrypt))
     }
 }
 
