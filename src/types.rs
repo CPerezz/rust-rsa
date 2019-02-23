@@ -1,3 +1,4 @@
+//! Types definitions
 use num_bigint::{BigUint, BigInt, ToBigInt, Sign};
 use crate::helpers::math::*;
 use crate::helpers::generics::*;
@@ -74,7 +75,7 @@ impl KeyPair {
         let n = &p * &q;
         let fi_n = (&p - &one) * (&q - &one);
         // Find a positive integer minor than fi_n , co-prime with fi_n 
-        let e = found_e(&fi_n).unwrap();
+        let e = find_e(&fi_n).unwrap();
 
         // Building Pk Struct
         let pk = PublicKey::new(&n, &e).unwrap();
@@ -133,7 +134,7 @@ impl PublicKey {
         }
     }
     // Encrypts the data passed on the params.
-    fn encrypt(&self, msg: &str) -> Result<String, &'static str> {
+    pub fn encrypt(&self, msg: &str) -> Result<String, &'static str> {
         if !msg.is_ascii(){
             return Err("Message isn't ASCII like. Please remove non-ASCII characters.")
         }else{
@@ -181,7 +182,7 @@ impl SecretKey {
     }
     
     // Decrypts the cyphertext giving back an &str
-    fn decrypt(&self, text: &str) -> Result<String, &'static str> {
+    pub fn decrypt(&self, text: &str) -> Result<String, &'static str> {
         let c = BigUint::from_str(text).unwrap();
         let result_as_bytes = mod_exp_pow(&c, &self.d, &self.n).to_bytes_be();
         let res_decrypt = std::str::from_utf8(&result_as_bytes).unwrap();
@@ -189,28 +190,3 @@ impl SecretKey {
     }
 }
 
-
-#[test]
-fn generates_key_pair() {
-    let a = KeyPair::new(&512u32, &Threshold::new(&64));
-    println!("This is your KeyPair!!! {}", a.unwrap());
-}
-
-#[test]
-fn encrypts_info(){
-    let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
-    let msg = "Hello World!";
-    println!("{}", kp.pk.encrypt(msg).unwrap());
-}
-
-#[test]
-fn encrypts_decrypts_info(){
-    let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
-    let msg = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent non nunc et ipsum tempus fermentum";
-    let cyphertext = kp.pk.encrypt(msg).unwrap();
-    
-
-    let res_decrypt = kp.sk.decrypt(&cyphertext).unwrap();
-    println!("Result of decryption is: {}", res_decrypt);
-    assert_eq!(res_decrypt, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent non nunc et ipsum tempus fermentum")
-}
