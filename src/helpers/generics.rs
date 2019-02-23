@@ -1,3 +1,4 @@
+//! Generic helper functions.
 use num_bigint::{BigUint, BigInt};
 use num::{Zero, One, Signed};
 use std::str::FromStr;
