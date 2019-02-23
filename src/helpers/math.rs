@@ -142,7 +142,7 @@ pub fn found_e(fi_n: &BigUint) -> Result<BigUint, bool> {
 
     if res == one {
         a = a.clone() - two.clone();
-        return Ok(biguint_from_bigint(&a));
+        return Ok(biguint_from_bigint(&a).unwrap());
     }
     Err(false)
 }
