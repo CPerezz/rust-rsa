@@ -2,7 +2,7 @@
 use num_bigint::{BigUint, BigInt, ToBigInt, Sign};
 use crate::helpers::math::*;
 use crate::helpers::generics::*;
-use num::{Signed, One};
+use num::{Signed, One, Num};
 use std::fmt;
 use std::str::FromStr;
 
@@ -139,7 +139,7 @@ impl PublicKey {
             return Err("Message isn't ASCII like. Please remove non-ASCII characters.")
         }else{
             let res = BigUint::from_bytes_be(msg.as_bytes());
-            Ok(format!("{}", mod_exp_pow(&res, &self.e, &self.n)))
+            Ok(format!("{}", mod_exp_pow(&res, &self.e, &self.n).to_str_radix(16u32)))
         }
     }
 }
@@ -182,8 +182,8 @@ impl SecretKey {
     }
     
     // Decrypts the cyphertext giving back an &str
-    pub fn decrypt(&self, text: &str) -> Result<String, &'static str> {
-        let c = BigUint::from_str(text).unwrap();
+    pub fn decrypt(&self, text: &String) -> Result<String, &'static str> {
+        let c = BigUint::from_str_radix(&text, 16u32).unwrap();
         let result_as_bytes = mod_exp_pow(&c, &self.d, &self.n).to_bytes_be();
         let res_decrypt = std::str::from_utf8(&result_as_bytes).unwrap();
         Ok(format!("{}", res_decrypt))
