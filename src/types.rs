@@ -4,7 +4,6 @@ use crate::helpers::math::*;
 use crate::helpers::generics::*;
 use num::{Signed, One, Num};
 use std::fmt;
-use std::str::FromStr;
 
 #[derive(Clone, PartialEq)]
 pub struct KeyPair {
@@ -94,6 +93,11 @@ impl KeyPair {
         };
         // Return the KeyPair struct
         Ok(kp)
+    }
+
+    /// Saves the KeyPair on two separated documents on the project folder encoded as base64.
+    pub fn save(kp: Self) -> Result<(), &'static str> {
+        unimplemented!()
     }
 }
 
