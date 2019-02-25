@@ -4,6 +4,8 @@ use crate::helpers::math::*;
 use crate::helpers::generics::*;
 use num::{Signed, One, Num};
 use std::fmt;
+use std::fs::File;
+use std::io::prelude::*;
 
 #[derive(Clone, PartialEq)]
 pub struct KeyPair {
@@ -15,8 +17,8 @@ pub struct KeyPair {
 
 #[derive(Clone, PartialEq)]
 pub struct PublicKey {
-    n: BigUint,
-    e: BigUint
+    pub n: BigUint,
+    pub e: BigUint
 }
 
 #[derive(Clone, PartialEq)]
@@ -96,9 +98,16 @@ impl KeyPair {
     }
 
     /// Saves the KeyPair on two separated documents on the project folder encoded as base64.
-    pub fn save(kp: Self) -> Result<(), &'static str> {
-        unimplemented!()
-    }
+    pub fn to_pem(&self) -> Result<(), &'static str> {
+        let mut pk_file = File::create("rsa_pk.pem").unwrap();
+        //Ask for encoded params and write.
+        unimplemented!()    }
+}
+#[cfg(test)]
+#[test]
+fn saves_e() {
+    let kp = KeyPair::new(&512u32, &Threshold::default()).unwrap();
+    kp.to_pem().unwrap();
 }
 
 
