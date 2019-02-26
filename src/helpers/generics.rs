@@ -4,9 +4,10 @@ use num_bigint::{BigUint, BigInt};
 use num::{Zero, One, Signed};
 use std::str::FromStr;
 use base64::*;
+use std::str::from_utf8;
 
 
-
+/// Formats a BigUint ready to be written on a file.
 macro_rules! encode_to_print {
     ($big_num: expr) => {
         encode(&$big_num.to_radix_be(16u32)).as_bytes()
@@ -14,7 +15,6 @@ macro_rules! encode_to_print {
 }
 
 #[cfg(test)]
-use std::str::from_utf8;
 #[test]
 fn encodes_to_print() {
     let known_prime_str =
@@ -44,9 +44,33 @@ pub fn biguint_from_bigint(a: &BigInt) -> Result<BigUint, &'static str> {
     Ok(BigUint::from_str(biguint_str).unwrap())
 }
 
-pub fn print(kp: &KeyPair) -> Result<String, &'static str> {
-    let mut pk_string = String::new();
-    let res1 = encode_to_print!(&kp.pk.e);
-
-    unimplemented!()
+// Format Keypair to print it on a file.
+pub fn prepare_to_print(kp: &KeyPair) -> Result<(String, String), &'static str> {
+    let (mut encoded_pk, mut encoded_sk) = (String::new(), String::new());
+    // Encoding Public Key
+    encoded_pk.push_str("---------- BEGIN RSA PUBLIC KEY ----------");
+    encoded_pk.push_str("\n");
+    encoded_pk.push_str(from_utf8(encode_to_print!(&kp.pk.n)).unwrap());
+    encoded_pk.push_str("\n");
+    encoded_pk.push_str(from_utf8(encode_to_print!(&kp.pk.e)).unwrap());
+    encoded_pk.push_str("\n");
+    encoded_pk.push_str("----------- END RSA PUBLIC KEY -----------");
+    encoded_pk.push_str("\n");
+    encoded_pk.push_str(&kp.size.to_string());
+    encoded_pk.push_str("\n");
+    encoded_pk.push_str(&kp.threshold.to_string());
+    
+    // Encoding Secret Key
+    encoded_sk.push_str("---------- BEGIN RSA PRIVATE KEY ----------");
+    encoded_sk.push_str("\n");
+    encoded_sk.push_str(from_utf8(encode_to_print!(&kp.sk.n)).unwrap());
+    encoded_sk.push_str("\n");
+    encoded_sk.push_str(from_utf8(encode_to_print!(&kp.sk.d)).unwrap());
+    encoded_sk.push_str("\n");
+    encoded_sk.push_str("----------- END RSA PRIVATE KEY -----------");
+    encoded_sk.push_str("\n");
+    encoded_sk.push_str(&kp.size.to_string());
+    encoded_sk.push_str("\n");
+    encoded_sk.push_str(&kp.threshold.to_string());
+    Ok((encoded_pk, encoded_sk))
 }
