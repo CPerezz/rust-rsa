@@ -4,6 +4,7 @@ use crate::helpers::math::*;
 use crate::helpers::generics::*;
 use num::{Signed, One, Num};
 use std::fmt;
+use std::str::FromStr;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -23,8 +24,8 @@ pub struct PublicKey {
 
 #[derive(Clone, PartialEq)]
 pub struct SecretKey {
-    n: BigUint,
-    d: BigUint
+    pub n: BigUint,
+    pub d: BigUint
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -32,6 +33,14 @@ pub struct Threshold {
     value: u32
 }
 
+impl From<u32> for Threshold {
+    /// Implement from<u32> for Threshold
+    fn from(val: u32) -> Self {
+        Threshold {
+            value: val
+        }
+    }
+}
 impl Threshold {
     // Creates a Threshold with a default error probability of generating a prime of 4^-64
     pub fn default() -> Self {
@@ -98,16 +107,22 @@ impl KeyPair {
     }
 
     /// Saves the KeyPair on two separated documents on the project folder encoded as base64.
-    pub fn to_pem(&self) -> Result<(), &'static str> {
-        let mut pk_file = File::create("rsa_pk.pem").unwrap();
+    pub fn print(&self) -> Result<(), &'static str> {
+        let mut pk_file = File::create("rsa_pk.key").unwrap();
+        let mut sk_file = File::create("rsa_sk.key").unwrap();
         //Ask for encoded params and write.
-        unimplemented!()    }
+        let (pk, sk) = prepare_to_print(&self).unwrap();
+        pk_file.write_all(pk.as_bytes()).unwrap();
+        sk_file.write_all(sk.as_bytes()).unwrap();
+        Ok(())
+    }
 }
+
 #[cfg(test)]
 #[test]
-fn saves_e() {
+fn prints_kp() {
     let kp = KeyPair::new(&512u32, &Threshold::default()).unwrap();
-    kp.to_pem().unwrap();
+    kp.print().unwrap();
 }
 
 
@@ -116,6 +131,20 @@ fn saves_e() {
 impl fmt::Display for PublicKey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "n: {}\ne: {}", self.n, self.e)
+    }
+}
+
+/// Allow to get a Public Key from different ways.
+impl From<&str> for PublicKey {
+    /// Generate a Public Key from it's Keys path.
+    fn from(path: &str) -> Self {
+        let (pk_path, _) = get_full_path(&String::from_str(path).unwrap());
+        let pk_file = match File::open(&pk_path) {
+            Ok(res) => res,
+            Err(_) => panic!("Failed to load Public Key from path: {}", pk_path)
+        };
+
+        unimplemented!()
     }
 }
 
@@ -140,7 +169,7 @@ impl PublicKey {
                             }
                         )
                 }else {
-                    return Err("Params passed to Sk builder haven't the properties to be a Public Key")
+                    return Err("Params passed to Sk builder haven't the right properties to be a Public Key")
             
                 }            
             }
@@ -165,6 +194,28 @@ impl fmt::Display for SecretKey {
     }
 }
 
+/// Allow to get a Secret Key from different ways.
+impl From<&str> for SecretKey {
+    /// Generate a Secret Key from it's Keys folder path.
+    fn from(path: &str) -> Self {
+        let (_, sk_path) = get_full_path(&String::from_str(path).unwrap());
+        let sk_file = match File::open(&sk_path) {
+            Ok(res) => res,
+            Err(_) => panic!("Failed to load Secret Key from path: {}", sk_path)
+        };
+        
+
+        unimplemented!()
+    }
+}
+/*
+impl From<&'a BigUint> <&'b BigUint> for SecretKey {
+
+    fn from(fi_n: &BigUint, d: &BigUint) -> Self {
+        unimplemented!()
+    }
+}
+*/
 impl SecretKey {
     // Generate a SecretKey struct from n and d co-prime factors.
     fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
