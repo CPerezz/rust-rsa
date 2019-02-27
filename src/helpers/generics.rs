@@ -5,6 +5,7 @@ use num::{Zero, One, Signed};
 use std::str::FromStr;
 use base64::*;
 use std::str::from_utf8;
+use std::fs::File;
 
 
 /// Formats a BigUint ready to be written on a file.
@@ -73,4 +74,20 @@ pub fn prepare_to_print(kp: &KeyPair) -> Result<(String, String), &'static str> 
     encoded_sk.push_str("\n");
     encoded_sk.push_str(&kp.threshold.to_string());
     Ok((encoded_pk, encoded_sk))
+}
+
+/// Gets a path to rsa keys and completes it.
+pub fn get_full_path(path: &String) -> (String, String) {
+    let mut full_pk_path = String::new();
+    let mut full_sk_path = String::new();
+    full_pk_path.push_str(path);
+    full_pk_path.push_str("/rsa_pk.key");
+    full_sk_path.push_str(path);
+    full_sk_path.push_str("/rsa_sk.key");
+    (full_pk_path, full_sk_path)
+}
+
+/// Gets Public Key params from the Pk file.
+pub fn get_pk_params(pk_file: &File) -> Result<PublicKey, &'static str> {
+    unimplemented!()
 }
