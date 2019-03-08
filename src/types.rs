@@ -1,4 +1,4 @@
-//! Types definitions
+//! Type definitions
 use num_bigint::{BigUint, BigInt, ToBigInt, Sign};
 use crate::helpers::math::*;
 use crate::helpers::generics::*;
@@ -7,6 +7,9 @@ use std::fmt;
 use std::str::FromStr;
 use std::fs::File;
 use std::io::prelude::*;
+use std::path::Path;
+use std::ffi::OsStr;
+
 
 #[derive(Clone, PartialEq)]
 pub struct KeyPair {
@@ -41,16 +44,19 @@ impl From<u32> for Threshold {
         }
     }
 }
-impl Threshold {
-    // Creates a Threshold with a default error probability of generating a prime of 4^-64
-    pub fn default() -> Self {
+
+impl Default for Threshold {
+    /// Creates a Threshold with a default error probability of generating a prime of 4^-64
+    fn default() -> Self {
         let threshold = Threshold {
             value: 9 as u32
         };
         threshold
     }
+}
 
-    // Creates a Threshold with a selected value as thresholf of P(err). P(err prime) = 4^-threshold. 
+impl Threshold {
+    /// Creates a Threshold with a selected value as thresholf of P(err). P(err prime) = 4^-threshold. 
     pub fn new(th: &u32) -> Self {
         let th = Threshold {
             value: *th
@@ -58,14 +64,14 @@ impl Threshold {
         th
     }
 
-    // Gets the value of a Threshold and returns it as u32.
+    /// Gets the value of a Threshold and returns it as u32.
     pub fn value(th: Self) -> u32 {
         th.value
     }
 }
 
 
-// Implementation of Display for KeyPair Struct.
+/// Implementation of Display for KeyPair Struct.
 impl fmt::Display for KeyPair {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "\nPublic Key: \n{}\nSecret Key: \n{}\nSize: {}\nThreshold: {} which gives a P(err_primes_gen) = 4^(-{})", self.pk, self.sk, self.size, self.threshold, self.threshold)
@@ -73,8 +79,8 @@ impl fmt::Display for KeyPair {
 }
 
 impl KeyPair {
-    // Generate a new KeyPair Struct from scratch by giving the size of the key desired (in bits) and the threshold of P(err) while assuming that
-    // a number is prime. Statistic methods are used to found that numbers. P(err) = 4^-threshold (As is demonstraded on the Rabin-Miller algorithm)
+    /// Generate a new KeyPair Struct from scratch by giving the size of the key desired (in bits) and the threshold of P(err) while assuming that
+    /// a number is prime. Statistic methods are used to found that numbers. P(err) = 4^-threshold (As is demonstraded on the Rabin-Miller algorithm)
     pub fn new(size: &u32, threshold: &Threshold) -> Result<Self, &'static str> {
         // Gen basic needed variables
         let (_, one, _) = gen_basic_biguints();
@@ -127,7 +133,7 @@ fn prints_kp() {
 
 
 
-// Implementation of Display for KeyPair Struct.
+/// Implementation of Display for KeyPair Struct.
 impl fmt::Display for PublicKey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "n: {}\ne: {}", self.n, self.e)
@@ -139,25 +145,31 @@ impl From<&str> for PublicKey {
     /// Generate a Public Key from it's Keys path.
     fn from(path: &str) -> Self {
         let (pk_path, _) = get_full_path(&String::from_str(path).unwrap());
-        let pk_file = match File::open(&pk_path) {
-            Ok(res) => res,
+        let _pk_file = match File::open(&pk_path) {
+            Ok(res) => {
+                let a = get_pk_params(&res);
+            },
             Err(_) => panic!("Failed to load Public Key from path: {}", pk_path)
         };
-
         unimplemented!()
     }
 }
+#[cfg(test)]
+#[test]
+fn gets_pk_from_path() {
+    let pk = PublicKey::from(".");
+}   
 
 impl PublicKey {
-    // Generate a PublicKey struct from n and d co-prime factors.
-    fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
+    /// Generate a PublicKey struct from n and d co-prime factors.
+    pub fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
         Ok(PublicKey {
             n: _n.to_owned(),
             e: _e.to_owned()
         })
     }
-    // Generate a PublicKey struct from n, fi_n and d params with the co-prime property checking.
-    fn new_from_fi_n_e(_n: &BigUint, _fi_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
+    /// Generate a PublicKey struct from n, fi_n and d params with the co-prime property checking.
+    pub fn new_from_fi_n_e(_n: &BigUint, _fi_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
         let (_, _one, _) = gen_basic_bigints();
 
         match egcd(&mut BigInt::from_biguint(Sign::Plus, _fi_n.to_owned()), &mut BigInt::from_biguint(Sign::Plus, _e.to_owned())) {
@@ -175,7 +187,7 @@ impl PublicKey {
             }
         }
     }
-    // Encrypts the data passed on the params.
+    /// Encrypts the data passed on the params.
     pub fn encrypt(&self, msg: &str) -> Result<String, &'static str> {
         if !msg.is_ascii(){
             return Err("Message isn't ASCII like. Please remove non-ASCII characters.")
@@ -187,7 +199,7 @@ impl PublicKey {
 }
 
 
-// Implementation of Display for KeyPair Struct.
+/// Implementation of Display for KeyPair Struct.
 impl fmt::Display for SecretKey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "n: {}\nd: {}", self.n, self.d)
@@ -217,7 +229,7 @@ impl From<&'a BigUint> <&'b BigUint> for SecretKey {
 }
 */
 impl SecretKey {
-    // Generate a SecretKey struct from n and d co-prime factors.
+    /// Generate a SecretKey struct from n and d co-prime factors.
     fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
         Ok(SecretKey {
             n: _n.to_owned(),
@@ -225,7 +237,7 @@ impl SecretKey {
         })
     }
 
-    // Generate a SecretKey struct from n, fi_n and d params with the co-prime property checking.
+    /// Generate a SecretKey struct from n, fi_n and d params with the co-prime property checking.
     pub fn new_from_fi_n_e(_n: &BigUint, _fi_n: &BigUint, _d: &BigUint) -> Result<Self, &'static str> {
         let (_, _one, _) = gen_basic_bigints();
 
@@ -245,7 +257,7 @@ impl SecretKey {
         }
     }
     
-    // Decrypts the cyphertext giving back an &str
+    /// Decrypts the cyphertext giving back an &str
     pub fn decrypt(&self, text: &String) -> Result<String, &'static str> {
         let c = BigUint::from_str_radix(&text, 16u32).unwrap();
         let result_as_bytes = mod_exp_pow(&c, &self.d, &self.n).to_bytes_be();
