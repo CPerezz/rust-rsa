@@ -6,6 +6,7 @@ use std::str::FromStr;
 use base64::*;
 use std::str::from_utf8;
 use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 
 /// Formats a BigUint ready to be written on a file.
@@ -88,6 +89,29 @@ pub fn get_full_path(path: &String) -> (String, String) {
 }
 
 /// Gets Public Key params from the Pk file.
+/// Returns a Public Key Struct or an Error.
 pub fn get_pk_params(pk_file: &File) -> Result<PublicKey, &'static str> {
-    unimplemented!()
+    let mut lines = vec!();
+    for line in BufReader::new(pk_file).lines() {
+        lines.push(line)
+    }
+    let pk = PublicKey::new(
+    &BigUint::from_radix_be(from_utf8(&base64::decode(&lines.remove(1).unwrap()).unwrap()).unwrap().as_bytes(), 16u32).unwrap(),
+    &BigUint::from_radix_be(from_utf8(&base64::decode(&lines.remove(1).unwrap()).unwrap()).unwrap().as_bytes(), 16u32).unwrap()).unwrap();
+    Ok(pk)
+}
+
+
+/// Gets ecret Key params from the Pk file.
+/// Returns a ecret Key Struct or an Error.
+pub fn get_sk_params(sk_file: &File) -> Result<SecretKey, &'static str> {
+    let mut lines = vec!();
+    for line in BufReader::new(sk_file).lines() {
+        lines.push(line)
+    }
+    let sk = SecretKey::new(
+    &BigUint::from_radix_be(from_utf8(&base64::decode(&lines.remove(1).unwrap()).unwrap()).unwrap().as_bytes(), 16u32).unwrap(),
+    &BigUint::from_radix_be(from_utf8(&base64::decode(&lines.remove(1).unwrap()).unwrap()).unwrap().as_bytes(), 16u32).unwrap()).unwrap();
+    println!("{}", sk);
+    Ok(sk)
 }
