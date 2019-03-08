@@ -124,13 +124,6 @@ impl KeyPair {
     }
 }
 
-#[cfg(test)]
-#[test]
-fn prints_kp() {
-    let kp = KeyPair::new(&512u32, &Threshold::default()).unwrap();
-    kp.print().unwrap();
-}
-
 
 
 /// Implementation of Display for KeyPair Struct.
@@ -147,18 +140,13 @@ impl From<&str> for PublicKey {
         let (pk_path, _) = get_full_path(&String::from_str(path).unwrap());
         let _pk_file = match File::open(&pk_path) {
             Ok(res) => {
-                let a = get_pk_params(&res);
+                return get_pk_params(&res).unwrap()
             },
             Err(_) => panic!("Failed to load Public Key from path: {}", pk_path)
         };
-        unimplemented!()
     }
 }
-#[cfg(test)]
-#[test]
-fn gets_pk_from_path() {
-    let pk = PublicKey::from(".");
-}   
+ 
 
 impl PublicKey {
     /// Generate a PublicKey struct from n and d co-prime factors.
@@ -168,6 +156,7 @@ impl PublicKey {
             e: _e.to_owned()
         })
     }
+    
     /// Generate a PublicKey struct from n, fi_n and d params with the co-prime property checking.
     pub fn new_from_fi_n_e(_n: &BigUint, _fi_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
         let (_, _one, _) = gen_basic_bigints();
@@ -187,6 +176,7 @@ impl PublicKey {
             }
         }
     }
+
     /// Encrypts the data passed on the params.
     pub fn encrypt(&self, msg: &str) -> Result<String, &'static str> {
         if !msg.is_ascii(){
@@ -208,16 +198,15 @@ impl fmt::Display for SecretKey {
 
 /// Allow to get a Secret Key from different ways.
 impl From<&str> for SecretKey {
-    /// Generate a Secret Key from it's Keys folder path.
+    /// Generate a Secret Key from it's Keys folder path (Don't include the key name on the path).
     fn from(path: &str) -> Self {
         let (_, sk_path) = get_full_path(&String::from_str(path).unwrap());
-        let sk_file = match File::open(&sk_path) {
-            Ok(res) => res,
-            Err(_) => panic!("Failed to load Secret Key from path: {}", sk_path)
+        let _pk_file = match File::open(&sk_path) {
+            Ok(res) => {
+                return get_sk_params(&res).unwrap()
+            },
+            Err(_) => panic!("Failed to load Public Key from path: {}", sk_path)
         };
-        
-
-        unimplemented!()
     }
 }
 /*
@@ -230,7 +219,7 @@ impl From<&'a BigUint> <&'b BigUint> for SecretKey {
 */
 impl SecretKey {
     /// Generate a SecretKey struct from n and d co-prime factors.
-    fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
+    pub fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
         Ok(SecretKey {
             n: _n.to_owned(),
             d: _e.to_owned()
