@@ -6,6 +6,8 @@ use num::{Zero, One, Integer};
 use crate::helpers::generics::*;
 
 
+const DISCARTERS: [u8; 7] = [3, 5, 7, 11, 13, 17, 19];
+
 // Generates a big number of lenght = u32 param.
 pub fn gen_big_num(bit_len: &u32) -> BigUint {
     // RNG depends on rng_core crate.
@@ -49,6 +51,13 @@ fn rabin_miller(proposal: &BigUint, t: u32) -> bool {
     if proposal.clone() <= one.to_owned() {return false};
     // If proposal != 2 and modulus 2 = 0, Rabin-Miller fails.
     if proposal.clone() != two.to_owned() && proposal.clone() % two == zero.to_owned() {return false};
+    // Discarting proposals divisibles by DISCARTERS improving performance of the algorythm
+    let discarts: Vec<bool> = DISCARTERS.into_iter().map(|x| (proposal % x.to_biguint().unwrap()).is_zero()).collect();
+    println!("{:?}", discarts);
+    for result in discarts {
+        if result == true {return false} 
+    } 
+    
     // Getting exp to execute mulmod.
     let (s,d) = refactor(proposal);
 
@@ -88,6 +97,8 @@ fn rabin_miller_works() {
     "118595363679537468261258276757550704318651155601593299292198496313960907653004730006758459999825003212944725610469590674020124506249770566394260832237809252494505683255861199449482385196474342481641301503121142740933186279111209376061535491003888763334916103110474472949854230628809878558752830476310536476569";
     let known_prime: BigUint = FromStr::from_str(known_prime_str).unwrap();
     assert!(rabin_miller(&known_prime, 64));
+
+    assert_eq!(rabin_miller(&19u32.to_biguint().unwrap(), 9), false);
 }
 
 // Modular exponentiation implemented on binary exponentiation (squaring)
