@@ -22,16 +22,8 @@ fn generates_random_biguint() {
 
 #[cfg(test)]
 #[test]
-fn encrypts_info() {
-    let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
-    let msg = "Hello World!";
-    println!("{}", kp.pk.encrypt(msg).unwrap());
-}
-
-#[cfg(test)]
-#[test]
 fn encrypts_decrypts_info() {
-    let kp = KeyPair::new(&512u32, &Threshold::new(&10)).unwrap();
+    let kp = KeyPair::new(&1024u32, Threshold::from(10u32)).unwrap();
     let msg = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent non nunc et ipsum tempus fermentum";
     let cyphertext = kp.pk.encrypt(msg).unwrap();
 
