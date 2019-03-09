@@ -8,7 +8,6 @@ use std::str::FromStr;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use std::ffi::OsStr;
 
 
 #[derive(Clone, PartialEq)]
@@ -98,6 +97,7 @@ impl KeyPair {
         // Finding d and building Secret Key Struct
         let (_, _,mut d) = egcd(&mut fi_n.to_bigint().unwrap(), &mut e.to_bigint().unwrap());
         while d.is_negative() {
+            // Modular inverse.
             d = d + BigInt::from_biguint(Sign::Plus, fi_n.clone());
         }
         let sk = SecretKey::new(&n, &biguint_from_bigint(&d).unwrap()).unwrap();
@@ -134,10 +134,10 @@ impl fmt::Display for PublicKey {
 }
 
 /// Allow to get a Public Key from different ways.
-impl From<&str> for PublicKey {
+impl From<&Path> for PublicKey {
     /// Generate a Public Key from it's Keys path.
-    fn from(path: &str) -> Self {
-        let (pk_path, _) = get_full_path(&String::from_str(path).unwrap());
+    fn from(path: &Path) -> Self {
+        let pk_path = path.to_str().unwrap();
         let _pk_file = match File::open(&pk_path) {
             Ok(res) => {
                 return get_pk_params(&res).unwrap()
@@ -146,7 +146,19 @@ impl From<&str> for PublicKey {
         };
     }
 }
- 
+
+/// Given n and e co-prime factors.
+/// Returns a PublictKey Struct (without checking it's correctness)
+impl From<(&BigUint, &BigUint)> for PublicKey {
+
+    fn from((n, d): (&BigUint, &BigUint)) -> Self {
+        let pk = PublicKey {
+            n: n.clone(),
+            e: d.clone()
+        };
+        pk
+    }
+} 
 
 impl PublicKey {
     /// Generate a PublicKey struct from n and d co-prime factors.
@@ -189,6 +201,8 @@ impl PublicKey {
 }
 
 
+
+
 /// Implementation of Display for KeyPair Struct.
 impl fmt::Display for SecretKey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -196,11 +210,12 @@ impl fmt::Display for SecretKey {
     }
 }
 
-/// Allow to get a Secret Key from different ways.
-impl From<&str> for SecretKey {
+/// Gets a path to a Secret Key
+/// Returns a SecretKey Struct
+impl From<&Path> for SecretKey {
     /// Generate a Secret Key from it's Keys folder path (Don't include the key name on the path).
-    fn from(path: &str) -> Self {
-        let (_, sk_path) = get_full_path(&String::from_str(path).unwrap());
+    fn from(path: &Path) -> Self {
+        let sk_path = path.to_str().unwrap();
         let _pk_file = match File::open(&sk_path) {
             Ok(res) => {
                 return get_sk_params(&res).unwrap()
@@ -209,25 +224,31 @@ impl From<&str> for SecretKey {
         };
     }
 }
-/*
-impl From<&'a BigUint> <&'b BigUint> for SecretKey {
 
-    fn from(fi_n: &BigUint, d: &BigUint) -> Self {
-        unimplemented!()
+/// Given n and d co-prime factors.
+/// Returns a SecretKey Struct (without checking it's correctness)
+impl From<(&BigUint, &BigUint)> for SecretKey {
+
+    fn from((n, d): (&BigUint, &BigUint)) -> Self {
+        let sk = SecretKey {
+            n: n.clone(),
+            d: d.clone()
+        };
+        sk
     }
 }
-*/
+
 impl SecretKey {
     /// Generate a SecretKey struct from n and d co-prime factors.
-    pub fn new(_n: &BigUint, _e: &BigUint) -> Result<Self, &'static str> {
+    pub fn new(_n: &BigUint, _d: &BigUint) -> Result<Self, &'static str> {
         Ok(SecretKey {
             n: _n.to_owned(),
-            d: _e.to_owned()
+            d: _d.to_owned()
         })
     }
 
     /// Generate a SecretKey struct from n, fi_n and d params with the co-prime property checking.
-    pub fn new_from_fi_n_e(_n: &BigUint, _fi_n: &BigUint, _d: &BigUint) -> Result<Self, &'static str> {
+    pub fn new_from_fi_n_d(_n: &BigUint, _fi_n: &BigUint, _d: &BigUint) -> Result<Self, &'static str> {
         let (_, _one, _) = gen_basic_bigints();
 
         match egcd(&mut BigInt::from_biguint(Sign::Plus, _fi_n.to_owned()), &mut BigInt::from_biguint(Sign::Plus, _d.to_owned())) {
