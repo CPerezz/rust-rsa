@@ -12,9 +12,10 @@ TODO:
 - [x] Encrypt messages with Public Key.
 - [x] Decrypt messages with Secret Key. (**TESTED AND WORKING**)
 - [x] Implement From trait for Public, Secret and KeyPair.
-- [ ] Implement Parallel computations of p & q prime original numbers to increase performance.
+- [x] Implement Parallel computations of p & q prime original numbers to increase performance. (Increased performance (Still depending of randomness and Prime proximity))
 - [ ] Implement Hybrid encryption process using AES-128/256 (to determine).
-- [x] Optimize Rabin-Miller algorithm by discarting multiples of [3, 5, 7, 9, 11, 13, 15, 19] before start computing the algorythm.
+- [x] Optimize Rabin-Miller algorithm by discarting multiples of [3, 5, 7, 9, 11, 13, 15, 19] before start computing the algorythm. (Increased performance)
+- [ ] 
 - [ ] Brenchmark Rabin-Miller vs. Fermat's Primality test (see: [https://en.wikipedia.org/wiki/Fermat_primality_test](https://en.wikipedia.org/wiki/Fermat_primality_test). Not considering Baillie–PSW  since relies on Rabin-Miller.
 - [ ] Sign messages.
 - [ ] Implement Paddings (PKCS1, PKCS7, PKCS-OAP)
