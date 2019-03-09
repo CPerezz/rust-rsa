@@ -8,6 +8,7 @@ use std::str::FromStr;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
+use std::thread;
 
 
 #[derive(Clone, PartialEq)]
@@ -80,12 +81,15 @@ impl fmt::Display for KeyPair {
 impl KeyPair {
     /// Generate a new KeyPair Struct from scratch by giving the size of the key desired (in bits) and the threshold of P(err) while assuming that
     /// a number is prime. Statistic methods are used to found that numbers. P(err) = 4^-threshold (As is demonstraded on the Rabin-Miller algorithm)
-    pub fn new(size: &u32, threshold: &Threshold) -> Result<Self, &'static str> {
+    pub fn new(size: &'static u32, threshold: Threshold) -> Result<Self, &'static str> {
         // Gen basic needed variables
         let (_, one, _) = gen_basic_biguints();
-        // Gen p q primal base
-        let p = gen_big_prime(size, threshold.value);
+        // Gen p q primal base 
+        let p_comp = thread::spawn(move ||
+            gen_big_prime(size, threshold.value)
+        );
         let q = gen_big_prime(size, threshold.value);
+        let p = p_comp.join().unwrap();
         // Gen n and fi_n
         let n = &p * &q;
         let fi_n = (&p - &one) * (&q - &one);
