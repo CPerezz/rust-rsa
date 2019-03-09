@@ -1,4 +1,4 @@
-//! Type definitions
+//! Types
 use num_bigint::{BigUint, BigInt, ToBigInt, Sign};
 use crate::helpers::math::*;
 use crate::helpers::generics::*;

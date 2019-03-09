@@ -1,4 +1,4 @@
-//! Generic helper functions.
+//! Generic_Helpers
 use crate::types::*;
 use num_bigint::{BigUint, BigInt};
 use num::{Zero, One, Signed};
