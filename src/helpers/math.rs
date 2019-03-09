@@ -1,4 +1,4 @@
-//! Math functions to build keys with trusted primes
+//! Math
 use std::str::FromStr;
 use rand::Rng;
 use num_bigint::{ToBigUint, BigUint, RandBigInt, BigInt, Sign};
@@ -31,7 +31,7 @@ pub fn gen_big_prime(size: &u32, threshold: u32) -> BigUint {
 
 // Posible to remove and implement it on gen big prime
 // Given a prime proposal, compute Rabin Miller's algorithm.
-fn is_prime(proposal: &BigUint, threshold: u32) -> bool {
+pub fn is_prime(proposal: &BigUint, threshold: u32) -> bool {
     if !rabin_miller(proposal, threshold) {return false}
     true
 }
