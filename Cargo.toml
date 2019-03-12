@@ -1,11 +1,12 @@
 [package]
 name = "rsa-rust"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["CPerezz <c.perezbaro@gmail.com>"]
 edition = "2018"
 description = "A crate to build RSA KeyPairs and Encrypt/Decrypt&Sign info."
 readme = "README.md"
 keywords = ["rsa", "encrypt", "assymetric", "sign"]
+categories  =["Algorithms", "Cryptography", "Development tools"]
 license = "MIT"
 repository = "https://github.com/CPerezz/rust-rsa/"
 
